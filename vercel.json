@@ -3,19 +3,13 @@
     {
       "source": "/index.html",
       "headers": [
-        {
-          "key": "Content-Type",
-          "value": "text/html"
-        }
+        { "key": "Content-Type", "value": "text/html" }
       ]
     },
     {
-      "source": "/(.*\\.(js|css|png|jpg|ico|svg))",
+      "source": "/assets/(.*)",
       "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
       ]
     }
   ]
