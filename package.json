@@ -1,5 +1,11 @@
 {
   "name": "gp-community",
   "version": "1.0.0",
-  "description": "ClinicPro Community prototype"
+  "description": "ClinicPro Community prototype",
+  "scripts": {
+    "dev": "serve public -l 3000"
+  },
+  "devDependencies": {
+    "serve": "^14.2.4"
+  }
 }
