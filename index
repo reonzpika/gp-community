@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ClinicPro Community</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{--p:#2C6E6A;--pl:#E8F4F3;--pd:#1e4e4b;--s:#FFFFFF;--sm:#F7F8FA;--b:#E4E7EC;--t:#111827;--tm:#6B7280;--up:#E86940;--nd:#EF4444;--w:#F59E0B;--th:64px;--bh:56px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'DM Sans',sans-serif;background:#1a1a2e;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px}
+.shell{width:390px;height:844px;background:var(--sm);border-radius:48px;overflow:hidden;position:relative;box-shadow:0 40px 120px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.1),inset 0 0 0 2px rgba(255,255,255,.05)}
+.scr{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--sm);opacity:0;pointer-events:none;transition:opacity .2s}
+.scr.on{opacity:1;pointer-events:all}
+.scroll{flex:1;overflow-y:auto;padding-bottom:calc(var(--th) + 8px);-webkit-overflow-scrolling:touch}
+.scroll::-webkit-scrollbar{display:none}
+
+/* BAR */
+.bar{height:var(--bh);background:var(--s);border-bottom:1px solid var(--b);display:flex;align-items:center;padding:0 16px;gap:12px;flex-shrink:0;z-index:10}
+.bar-title{font-family:'DM Serif Display',serif;font-size:20px;color:var(--p);flex:1}
+.bar-sub{font-size:11px;color:var(--tm);font-weight:400;font-family:'DM Sans',sans-serif;margin-top:1px}
+.bk{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;font-size:22px;color:var(--t);transition:background .15s;flex-shrink:0}
+.bk:hover{background:var(--sm)}
+.ib{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;color:var(--tm);font-size:18px;position:relative;transition:background .15s}
+.ib:hover{background:var(--sm);color:var(--t)}
+.nb{position:absolute;top:4px;right:4px;width:8px;height:8px;background:var(--nd);border-radius:50%;border:2px solid var(--s)}
+
+/* TABS */
+.tabs{height:var(--th);background:var(--s);border-top:1px solid var(--b);display:flex;align-items:center;position:absolute;bottom:0;left:0;right:0;z-index:20;padding:0 4px}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;padding:8px 0;border-radius:12px;transition:all .15s}
+.tab:hover{background:var(--sm)}
+.ti{font-size:20px;color:var(--tm);transition:color .15s}
+.tl{font-size:10px;font-weight:500;color:var(--tm);transition:color .15s;letter-spacing:.3px}
+.tab.on .ti,.tab.on .tl{color:var(--p)}
+.tplus{width:52px;height:52px;background:var(--p);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:24px;color:#fff;box-shadow:0 4px 16px rgba(44,110,106,.4);transition:transform .15s;flex-shrink:0}
+.tplus:hover{transform:scale(1.05)}
+.tplus:active{transform:scale(.96)}
+
+/* TOGGLE */
+.tog{display:flex;background:var(--sm);border-radius:12px;padding:3px;margin:10px 16px 8px}
+.tb{flex:1;height:34px;border:none;background:transparent;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--tm);cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:5px}
+.tb.on{background:var(--s);color:var(--p);font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.1)}
+
+/* CARD */
+.card{background:var(--s);margin:5px 12px;border-radius:16px;padding:14px 16px;border:1px solid var(--b);cursor:pointer;transition:transform .15s,box-shadow .15s}
+.card:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.card:active{transform:scale(.99)}
+.card-pin{border-left:3px solid var(--w)}
+.plbl{font-size:11px;color:var(--w);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
+.ctag{display:inline-flex;align-items:center;gap:4px;background:var(--pl);color:var(--p);font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px;margin-bottom:7px}
+.ptitle{font-size:15px;font-weight:600;color:var(--t);line-height:1.35;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pmeta{display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.av{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;flex-shrink:0}
+.pacts{display:flex;align-items:center;gap:12px}
+.ab{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--tm);font-weight:500;cursor:pointer;padding:4px 6px;border-radius:8px;transition:all .15s;border:none;background:none;font-family:'DM Sans',sans-serif}
+.ab:hover{background:var(--sm);color:var(--t)}
+.ab.up{color:var(--up)}
+.ab.sv{margin-left:auto}
+.ab.sv.saved{color:var(--p)}
+
+/* CATEGORY CARDS */
+.ccat{background:var(--s);margin:0 12px 8px;border-radius:16px;padding:16px;border:1px solid var(--b);cursor:pointer;transition:transform .15s;display:flex;align-items:center;gap:14px}
+.ccat:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.07)}
+.cc-ico{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+.cc-info{flex:1}
+.cc-name{font-size:15px;font-weight:700;color:var(--t);margin-bottom:2px}
+.cc-desc{font-size:12px;color:var(--tm);margin-bottom:5px;line-height:1.35}
+.cc-stat{font-size:12px;color:var(--p);font-weight:600}
+.cc-arr{color:var(--tm);font-size:18px}
+.lock{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;margin-left:5px;vertical-align:middle}
+
+/* SUBCAT */
+.sc{background:var(--s);margin:0 12px 8px;border-radius:16px;padding:14px;border:1px solid var(--b);cursor:pointer;transition:transform .15s,box-shadow .15s;display:grid;grid-template-columns:44px 1fr auto;grid-template-rows:auto auto;gap:0 12px;align-items:start}
+.sc:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.sc:active{transform:scale(.99)}
+.sc-ico{grid-row:1;grid-column:1;width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-top:2px}
+.sc-info{grid-row:1;grid-column:2}
+.sc-name{font-size:14px;font-weight:700;color:var(--t);margin-bottom:2px}
+.sc-desc{font-size:12px;color:var(--tm);line-height:1.35;margin-bottom:4px}
+.sc-stat{font-size:11px;color:var(--p);font-weight:600}
+.sc-arr{grid-row:1;grid-column:3;color:var(--tm);font-size:18px;padding-top:10px}
+.sc-prev{grid-row:2;grid-column:2/4;font-size:12px;color:var(--tm);font-style:italic;line-height:1.4;margin-top:6px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+
+/* DIVIDER */
+.div{display:flex;align-items:center;padding:8px 16px;gap:8px}
+.dl{flex:1;height:1px;background:var(--b)}
+.dt{font-size:11px;color:var(--tm);font-weight:600;letter-spacing:.5px;text-transform:uppercase}
+
+/* TOOLS */
+.trow{padding:10px 0 4px}
+.thdr{display:flex;align-items:center;justify-content:space-between;padding:0 16px 10px}
+.ttitle{font-size:13px;font-weight:700;color:var(--t)}
+.tall{font-size:12px;color:var(--p);font-weight:600;cursor:pointer}
+.tscroll{display:flex;gap:10px;padding:0 16px 4px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tscroll::-webkit-scrollbar{display:none}
+.tc{flex-shrink:0;width:148px;background:var(--s);border:1px solid var(--b);border-radius:14px;padding:12px;cursor:pointer;transition:transform .15s}
+.tc:hover{transform:translateY(-2px)}
+
+/* THREAD */
+.tpost{background:var(--s);padding:16px;border-bottom:6px solid var(--sm)}
+.ttitle2{font-family:'DM Serif Display',serif;font-size:21px;color:var(--t);line-height:1.25;margin-bottom:12px;margin-top:6px}
+.tbody{font-size:15px;color:var(--t);line-height:1.6;margin-bottom:16px}
+.tacts{display:flex;align-items:center;gap:8px;padding-top:12px;border-top:1px solid var(--b)}
+.tap{display:flex;align-items:center;gap:6px;height:38px;padding:0 14px;border-radius:20px;background:var(--sm);border:1px solid var(--b);font-size:14px;font-weight:600;color:var(--t);cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif}
+.tap:hover{background:var(--pl);border-color:var(--p);color:var(--p)}
+.tap.on{background:rgba(232,105,64,.1);border-color:var(--up);color:var(--up)}
+.rhdr{padding:14px 16px 6px;font-size:13px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.5px}
+.reply{background:var(--s);padding:14px 16px;border-bottom:1px solid var(--b)}
+.reply-n{margin-left:32px;background:var(--sm);border-left:2px solid var(--b);padding-left:14px}
+.rb{font-size:14px;color:var(--t);line-height:1.55;margin-bottom:10px}
+.ra{display:flex;align-items:center;gap:10px}
+
+/* COMPOSE */
+.cov{position:absolute;inset:0;background:rgba(0,0,0,.4);z-index:29;opacity:0;pointer-events:none;transition:opacity .3s}
+.cov.on{opacity:1;pointer-events:all}
+.csh{position:absolute;bottom:0;left:0;right:0;background:var(--s);border-radius:24px 24px 0 0;padding:16px 16px 80px;box-shadow:0 -8px 40px rgba(0,0,0,.15);z-index:30;transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);max-height:85%;overflow-y:auto}
+.csh.on{transform:translateY(0)}
+.ch{width:36px;height:4px;background:var(--b);border-radius:2px;margin:0 auto 16px}
+.chdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.ctitle{font-size:16px;font-weight:700;color:var(--t)}
+.bpost{height:36px;padding:0 18px;background:var(--p);color:#fff;border:none;border-radius:20px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s}
+.bpost:disabled{background:var(--b);color:var(--tm);cursor:not-allowed}
+.bpost:not(:disabled):hover{background:var(--pd)}
+.cfield{margin-bottom:14px}
+.clbl{font-size:12px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.csel{width:100%;height:44px;border:1.5px solid var(--b);border-radius:12px;padding:0 14px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--t);background:var(--sm);outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;background-size:12px;transition:border-color .15s}
+.csel:focus{border-color:var(--p);background-color:var(--s)}
+.cinp{width:100%;border:1.5px solid var(--b);border-radius:12px;padding:12px 14px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--t);background:var(--sm);outline:none;resize:none;transition:border-color .15s;line-height:1.5}
+.cinp:focus{border-color:var(--p);background:var(--s)}
+.cinp::placeholder{color:var(--tm)}
+.ctool{display:flex;gap:8px;margin-top:6px}
+.ctbtn{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:1px solid var(--b);border-radius:8px;background:var(--s);cursor:pointer;font-size:13px;font-weight:700;color:var(--tm);transition:all .15s;font-family:'DM Sans',sans-serif}
+.ctbtn:hover{border-color:var(--p);color:var(--p);background:var(--pl)}
+.cdir{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--pl);border-radius:12px;border:1px dashed var(--p);cursor:pointer;margin-top:4px}
+.cdir:hover{background:#d4eeec}
+
+/* SEARCH */
+.sw{padding:12px 16px;background:var(--s);border-bottom:1px solid var(--b)}
+.sbar{display:flex;align-items:center;gap:10px;background:var(--sm);border:1.5px solid var(--b);border-radius:14px;padding:0 14px;height:44px;transition:border-color .15s}
+.sbar:focus-within{border-color:var(--p);background:var(--s)}
+.sbar input{flex:1;border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:15px;outline:none;color:var(--t)}
+.sbar input::placeholder{color:var(--tm)}
+.stabs{display:flex;gap:4px;padding:10px 16px;background:var(--s);border-bottom:1px solid var(--b)}
+.stab{height:32px;padding:0 14px;border-radius:20px;font-size:13px;font-weight:500;color:var(--tm);border:1.5px solid var(--b);background:transparent;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.stab.on{background:var(--p);color:#fff;border-color:var(--p);font-weight:600}
+.pill{display:inline-block;padding:7px 14px;border:1.5px solid var(--b);border-radius:20px;font-size:13px;color:var(--t);font-weight:500;margin:4px 4px 4px 0;cursor:pointer;transition:all .15s}
+.pill:hover{border-color:var(--p);color:var(--p);background:var(--pl)}
+
+/* NOTIF */
+.ni{display:flex;gap:12px;padding:14px 16px;background:var(--s);border-bottom:1px solid var(--b);cursor:pointer;transition:background .15s}
+.ni:hover{background:var(--sm)}
+.ni.unread{background:#f0f9f8}
+.ni-aw{position:relative;flex-shrink:0}
+.ni-a{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff}
+.ni-ti{position:absolute;bottom:-2px;right:-2px;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;border:2px solid var(--s)}
+.ni-b{flex:1}
+.ni-t{font-size:14px;color:var(--t);line-height:1.4;margin-bottom:4px}
+.ni-t strong{font-weight:600}
+.ni-p{font-size:13px;color:var(--tm);font-style:italic;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ni-ts{font-size:12px;color:var(--tm)}
+.ni-d{width:8px;height:8px;background:var(--p);border-radius:50%;flex-shrink:0;margin-top:6px}
+
+/* PROFILE */
+.ph{background:var(--s);padding:20px 16px 16px;border-bottom:1px solid var(--b);display:flex;flex-direction:column;align-items:center;text-align:center}
+.pav{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#fff;margin-bottom:12px;border:3px solid var(--pl)}
+.pname{font-size:20px;font-weight:700;color:var(--t);margin-bottom:3px}
+.prole{font-size:14px;color:var(--tm);margin-bottom:12px}
+.pstats{display:flex;gap:24px;margin-bottom:14px}
+.ps{text-align:center}
+.psn{font-size:20px;font-weight:700;color:var(--t)}
+.psl{font-size:11px;color:var(--tm);font-weight:500}
+.ptabs{display:flex;background:var(--s);border-bottom:1px solid var(--b)}
+.ptab{flex:1;height:44px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;color:var(--tm);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;gap:5px}
+.ptab.on{color:var(--p);border-bottom-color:var(--p);font-weight:700}
+
+/* GATE */
+.gate{margin:16px 12px;background:linear-gradient(135deg,#fef9e7,#fef3c7);border:1.5px solid var(--w);border-radius:16px;padding:16px;display:flex;gap:12px;align-items:flex-start}
+.gate-i{font-size:24px;flex-shrink:0}
+.gate-title{font-size:14px;font-weight:700;color:#92400e;margin-bottom:4px}
+.gate-txt{font-size:13px;color:#78350f;line-height:1.45;margin-bottom:10px}
+.gate-btn{height:36px;padding:0 16px;background:#D97706;color:#fff;border:none;border-radius:20px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer}
+.gate-btn:hover{background:#b45309}
+
+/* UTIL */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;gap:8px}
+.toast{position:absolute;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:#111827;color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;font-weight:500;white-space:nowrap;opacity:0;transition:all .3s;z-index:100;pointer-events:none}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.txbtn{font-size:13px;color:var(--p);font-weight:600;cursor:pointer;padding:4px 8px;border-radius:8px;transition:background .15s;font-family:'DM Sans',sans-serif;border:none;background:none}
+.txbtn:hover{background:var(--pl)}
+
+/* ONBOARDING */
+#scr-ob{background:linear-gradient(160deg,#1e4e4b 0%,#2C6E6A 50%,#3a8f8a 100%)}
+.ob{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;text-align:center}
+.ob-logo{font-family:'DM Serif Display',serif;font-size:36px;color:#fff;margin-bottom:6px}
+.ob-logo span{color:rgba(255,255,255,.6);font-style:italic;font-size:20px;display:block;margin-top:-4px}
+.ob-illo{width:180px;height:180px;margin:26px auto;position:relative}
+.ob-b{position:absolute;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:14px;backdrop-filter:blur(8px);padding:8px 12px;font-size:11px;color:#fff;font-weight:500;white-space:nowrap;animation:fl 3s ease-in-out infinite}
+@keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.ob-ci{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:64px;height:64px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;border:2px solid rgba(255,255,255,.3)}
+.ob-h1{font-family:'DM Serif Display',serif;font-size:26px;color:#fff;line-height:1.2;margin-bottom:10px}
+.ob-sub{font-size:14px;color:rgba(255,255,255,.75);line-height:1.5;margin-bottom:30px}
+.ob-feats{display:flex;flex-direction:column;gap:10px;width:100%;margin-bottom:30px}
+.ob-feat{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:14px;padding:11px 14px;text-align:left}
+.ob-fi{font-size:20px;width:32px;text-align:center;flex-shrink:0}
+.ob-ft{font-size:13px;color:#fff;font-weight:500;line-height:1.3}
+.ob-ft small{display:block;font-weight:400;color:rgba(255,255,255,.65);font-size:11px;margin-top:2px}
+.bgo{width:100%;height:52px;background:#fff;color:var(--p);border:none;border-radius:16px;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:600;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.2);transition:transform .15s}
+.bgo:hover{transform:translateY(-1px)}
+.ob-si{margin-top:14px;font-size:13px;color:rgba(255,255,255,.65);cursor:pointer}
+.ob-si span{color:#fff;font-weight:600;text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="shell">
+<div class="toast" id="toast"></div>
+
+<!-- COMPOSE -->
+<div class="cov" id="cov" onclick="closeC()"></div>
+<div class="csh" id="csh">
+  <div class="ch"></div>
+  <div class="chdr"><span class="ctitle">New Post</span><button class="bpost" id="pbtn" disabled onclick="submitPost()">Post</button></div>
+  <div class="cfield"><div class="clbl">Category *</div>
+    <select class="csel" id="ccat" onchange="validateC()">
+      <option value="">Select...</option>
+      <option>🌐 Community — General</option>
+      <option>🩺 GP Forum — Clinical</option>
+      <option>🤖 GP Forum — AI and Tech</option>
+      <option>☕ GP Forum — Staffroom</option>
+      <option>🏢 Practice Owners</option>
+    </select>
+  </div>
+  <div class="cfield"><div class="clbl">Title *</div><textarea class="cinp" id="ctitle" rows="2" placeholder="What's your question or topic?" maxlength="120" oninput="validateC()"></textarea></div>
+  <div class="cfield"><div class="clbl">Body <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></div>
+    <textarea class="cinp" id="cbody" rows="4" placeholder="Add more detail or context..."></textarea>
+    <div class="ctool"><button class="ctbtn"><b>B</b></button><button class="ctbtn"><i>I</i></button><button class="ctbtn">🔗</button><button class="ctbtn">&lt;&gt;</button></div>
+  </div>
+  <div class="cdir" onclick="toast('Tool submission coming soon!')"><span style="font-size:20px">🔧</span><div style="font-size:13px;font-weight:600;color:var(--p);flex:1">Submit a tool to the directory<small style="display:block;font-weight:400;font-size:11px;opacity:.75">Share a useful resource with NZ GPs</small></div><span style="color:var(--p)">›</span></div>
+</div>
+
+<!-- ══ ONBOARDING ══ -->
+<div class="scr on" id="scr-ob">
+  <div class="ob">
+    <div class="ob-logo">ClinicPro<span>Community</span></div>
+    <div class="ob-illo">
+      <div class="ob-ci">🩺</div>
+      <div class="ob-b" style="top:6px;left:0;animation-delay:0s">💬 Clinical questions</div>
+      <div class="ob-b" style="top:56px;right:-8px;animation-delay:.8s">🤖 AI tools</div>
+      <div class="ob-b" style="bottom:10px;left:6px;animation-delay:1.6s">☕ Staffroom</div>
+    </div>
+    <h1 class="ob-h1">Where NZ GPs talk to each other</h1>
+    <p class="ob-sub">The organised, searchable alternative to the GP Facebook group.</p>
+    <div class="ob-feats">
+      <div class="ob-feat"><div class="ob-fi">💬</div><div class="ob-ft">Organised discussions<small>Topics by category — not a chaotic feed</small></div></div>
+      <div class="ob-feat"><div class="ob-fi">🔒</div><div class="ob-ft">GP-only spaces<small>Verified peer discussions you can trust</small></div></div>
+      <div class="ob-feat"><div class="ob-fi">🔧</div><div class="ob-ft">GP tool directory<small>Discover and submit useful clinical tools</small></div></div>
+    </div>
+    <button class="bgo" onclick="nav('scr-home')">Get started</button>
+    <div class="ob-si">Already a member? <span onclick="nav('scr-home')">Sign in</span></div>
+  </div>
+</div>
+
+<!-- ══ HOME ══ -->
+<div class="scr" id="scr-home">
+  <div class="bar">
+    <div class="bar-title">ClinicPro <span style="font-family:'DM Sans';font-size:14px;color:var(--tm);font-weight:400">Community</span></div>
+    <div class="ib" onclick="nav('scr-search')">🔍</div>
+    <div class="ib" onclick="switchTab('notifs')">🔔<div class="nb"></div></div>
+  </div>
+  <div class="scroll">
+    <div class="tog"><button class="tb on" id="htb" onclick="toggleFeed('t')">🔥 Trending</button><button class="tb" id="hlb" onclick="toggleFeed('l')">🕐 Latest</button></div>
+
+    <div class="card card-pin" onclick="openThread(0)">
+      <div class="plbl">📌 Pinned</div>
+      <div class="ctag">🌐 Community</div>
+      <div class="ptitle">Welcome to ClinicPro Community — read this first</div>
+      <div class="pmeta"><div class="av" style="width:22px;height:22px;font-size:10px;background:#2C6E6A">T</div><span style="font-size:13px;color:var(--tm);font-weight:500">Dr. Tane W.</span><div style="width:3px;height:3px;background:var(--b);border-radius:50%"></div><span style="font-size:12px;color:var(--tm)">5 days ago</span></div>
+      <div class="pacts"><button class="ab" onclick="upvote(event,this)">▲ <span>52</span></button><button class="ab">💬 14</button><button class="ab sv" onclick="savePost(event,this)">🔖</button></div>
+    </div>
+
+    <div class="trow">
+      <div class="thdr"><div class="ttitle">🔥 Trending Tools</div><div class="tall" onclick="toast('Directory coming soon!')">See all</div></div>
+      <div class="tscroll">
+        <div class="tc" onclick="toast('Opening Jack of All Organs...')"><div style="font-size:22px;margin-bottom:6px">🧮</div><div style="font-size:13px;font-weight:600;color:var(--t);margin-bottom:3px">Jack of All Organs</div><div style="font-size:11px;color:var(--tm);margin-bottom:7px;line-height:1.3">Pregnancy, paediatric centiles, steroid tapers</div><div style="font-size:11px;color:var(--p);font-weight:600">🔖 234 saved</div></div>
+        <div class="tc" onclick="toast('Opening NZ Formulary...')"><div style="font-size:22px;margin-bottom:6px">💊</div><div style="font-size:13px;font-weight:600;color:var(--t);margin-bottom:3px">NZ Formulary</div><div style="font-size:11px;color:var(--tm);margin-bottom:7px;line-height:1.3">Drug interactions and Pharmac subsidy info</div><div style="font-size:11px;color:var(--p);font-weight:600">🔖 312 saved</div></div>
+        <div class="tc" onclick="toast('Opening ReadCode NZ...')"><div style="font-size:22px;margin-bottom:6px">🏥</div><div style="font-size:13px;font-weight:600;color:var(--t);margin-bottom:3px">ReadCode NZ</div><div style="font-size:11px;color:var(--tm);margin-bottom:7px;line-height:1.3">NZ-focused clinical coding reference</div><div style="font-size:11px;color:var(--p);font-weight:600">🔖 189 saved</div></div>
+        <div class="tc" onclick="toast('Opening Healthify...')"><div style="font-size:22px;margin-bottom:6px">❤️</div><div style="font-size:13px;font-weight:600;color:var(--t);margin-bottom:3px">Healthify</div><div style="font-size:11px;color:var(--tm);margin-bottom:7px;line-height:1.3">Patient education resources and calculators</div><div style="font-size:11px;color:var(--p);font-weight:600">🔖 156 saved</div></div>
+      </div>
+    </div>
+
+    <div class="div"><div class="dl"></div><div class="dt">Discussions</div><div class="dl"></div></div>
+
+    <div class="card" onclick="openThread(1)"><div class="ctag">🩺 Clinical</div><div class="ptitle">Long-term low-dose prednisolone in elderly patients with polymyalgia — when do you try to wean and what's your threshold?</div><div class="pmeta"><div class="av" style="width:22px;height:22px;font-size:10px;background:#7C3AED">F</div><span style="font-size:13px;color:var(--tm);font-weight:500">Dr. Fiona H.</span><div style="width:3px;height:3px;background:var(--b);border-radius:50%"></div><span style="font-size:12px;color:var(--tm)">3h ago</span></div><div class="pacts"><button class="ab" onclick="upvote(event,this)">▲ <span>21</span></button><button class="ab">💬 11</button><button class="ab sv" onclick="savePost(event,this)">🔖</button></div></div>
+
+    <div class="card" onclick="openThread(2)"><div class="ctag">🤖 AI and Tech</div><div class="ptitle">Using an AI scribe in consultations — which tools are NZ GPs actually finding useful, and what are the privacy concerns?</div><div class="pmeta"><div class="av" style="width:22px;height:22px;font-size:10px;background:#DC2626">M</div><span style="font-size:13px;color:var(--tm);font-weight:500">Dr. Marcus T.</span><div style="width:3px;height:3px;background:var(--b);border-radius:50%"></div><span style="font-size:12px;color:var(--tm)">5h ago</span></div><div class="pacts"><button class="ab" onclick="upvote(event,this)">▲ <span>38</span></button><button class="ab">💬 17</button><button class="ab sv" onclick="savePost(event,this)">🔖</button></div></div>
+
+    <div class="card" onclick="openThread(3)"><div class="ctag">🩺 Clinical</div><div class="ptitle">Recurrent UTIs in post-menopausal women — are you using topical oestrogen routinely now? What's your threshold?</div><div class="pmeta"><div class="av" style="width:22px;height:22px;font-size:10px;background:#059669">N</div><span style="font-size:13px;color:var(--tm);font-weight:500">Dr. Ngaio P.</span><div style="width:3px;height:3px;background:var(--b);border-radius:50%"></div><span style="font-size:12px;color:var(--tm)">Yesterday</span></div><div class="pacts"><button class="ab" onclick="upvote(event,this)">▲ <span>29</span></button><button class="ab">💬 16</button><button class="ab sv" onclick="savePost(event,this)">🔖</button></div></div>
+
+    <div class="card" onclick="openThread(4)"><div class="ctag">☕ Staffroom</div><div class="ptitle">Patient handed me a printout from a wellness influencer saying their chronic fatigue is definitely mould toxicity. How do you navigate these consults without losing them?</div><div class="pmeta"><div class="av" style="width:22px;height:22px;font-size:10px;background:#D97706">R</div><span style="font-size:13px;color:var(--tm);font-weight:500">Dr. Rachel O.</span><div style="width:3px;height:3px;background:var(--b);border-radius:50%"></div><span style="font-size:12px;color:var(--tm)">Yesterday</span></div><div class="pacts"><button class="ab" onclick="upvote(event,this)">▲ <span>44</span></button><button class="ab">💬 22</button><button class="ab sv" onclick="savePost(event,this)">🔖</button></div></div>
+
+    <div class="card" onclick="openThread(5)"><div class="ctag">🏢 Practice Owners</div><div class="ptitle">Patient portal implementation — which system are practices using and what's the realistic time cost on the clinical team?</div><div class="pmeta"><div class="av" style="width:22px;height:22px;font-size:10px;background:#0369A1">J</div><span style="font-size:13px;color:var(--tm);font-weight:500">Dr. James K.</span><div style="width:3px;height:3px;background:var(--b);border-radius:50%"></div><span style="font-size:12px;color:var(--tm)">2 days ago</span></div><div class="pacts"><button class="ab" onclick="upvote(event,this)">▲ <span>17</span></button><button class="ab">💬 9</button><button class="ab sv" onclick="savePost(event,this)">🔖</button></div></div>
+
+    <div class="card" onclick="openThread(6)"><div class="ctag">🩺 Clinical</div><div class="ptitle">Incidental finding of mild thrombocytopaenia on routine bloods — what's your workup approach before referring to haematology?</div><div class="pmeta"><div class="av" style="width:22px;height:22px;font-size:10px;background:#7C3AED">S</div><span style="font-size:13px;color:var(--tm);font-weight:500">Dr. Steph L.</span><div style="width:3px;height:3px;background:var(--b);border-radius:50%"></div><span style="font-size:12px;color:var(--tm)">2 days ago</span></div><div class="pacts"><button class="ab" onclick="upvote(event,this)">▲ <span>25</span></button><button class="ab">💬 13</button><button class="ab sv" onclick="savePost(event,this)">🔖</button></div></div>
+
+  </div>
+  <div class="tabs">
+    <div class="tab on" onclick="switchTab('home')"><div class="ti">🏠</div><div class="tl">Home</div></div>
+    <div class="tab" onclick="switchTab('topics')"><div class="ti">⊞</div><div class="tl">Topics</div></div>
+    <div class="tplus" onclick="openC()">+</div>
+    <div class="tab" onclick="switchTab('notifs')"><div class="ti" style="position:relative">🔔<span style="position:absolute;top:-2px;right:-2px;width:8px;height:8px;background:var(--nd);border-radius:50%;border:2px solid #fff;display:block"></span></div><div class="tl">Alerts</div></div>
+    <div class="tab" onclick="switchTab('profile')"><div class="ti">👤</div><div class="tl">Profile</div></div>
+  </div>
+</div>
+
+<!-- ══ TOPICS ══ -->
+<div class="scr" id="scr-topics">
+  <div class="bar"><div class="bar-title">Topics</div><div class="ib" onclick="nav('scr-search')">🔍</div></div>
+  <div class="scroll" style="padding-top:12px">
+    <div style="padding:0 16px 12px;font-size:13px;color:var(--tm);line-height:1.5">Three spaces, each with a different audience.</div>
+
+    <div class="ccat" onclick="nav('scr-community')">
+      <div class="cc-ico" style="background:#E0F2FE">🌐</div>
+      <div class="cc-info">
+        <div class="cc-name">Community</div>
+        <div class="cc-desc">Open to all NZ healthcare — news, introductions, general discussion</div>
+        <div class="cc-stat">54 posts · 18 active today</div>
+      </div>
+      <div class="cc-arr">›</div>
+    </div>
+
+    <div class="ccat" onclick="nav('scr-gpforum')">
+      <div class="cc-ico" style="background:#FEE2E2">🩺</div>
+      <div class="cc-info">
+        <div class="cc-name">GP Forum <span class="lock" style="background:#FEE2E2;color:#DC2626">🔒 GPs only</span></div>
+        <div class="cc-desc">Clinical, AI and Tech, Staffroom — verified GP discussions</div>
+        <div class="cc-stat">263 posts · 61 active today</div>
+      </div>
+      <div class="cc-arr">›</div>
+    </div>
+
+    <div class="ccat" onclick="nav('scr-owners')">
+      <div class="cc-ico" style="background:#FEF3C7">🏢</div>
+      <div class="cc-info">
+        <div class="cc-name">Practice Owners <span class="lock" style="background:#FEF3C7;color:#D97706">🔒 Owners only</span></div>
+        <div class="cc-desc">Running a practice — finances, staffing, compliance, equipment</div>
+        <div class="cc-stat">43 posts · 12 active today</div>
+      </div>
+      <div class="cc-arr">›</div>
+    </div>
+
+    <div style="padding:16px 16px 0"><div style="background:var(--pl);border:1.5px dashed var(--p);border-radius:14px;padding:14px 16px;display:flex;gap:12px;align-items:center;cursor:pointer" onclick="toast('Suggest a topic — coming soon!')"><span style="font-size:20px">💡</span><div><div style="font-size:13px;font-weight:600;color:var(--p)">Suggest a new topic</div><div style="font-size:12px;color:var(--p);opacity:.75;margin-top:1px">Missing something? Let us know.</div></div></div></div>
+  </div>
+  <div class="tabs">
+    <div class="tab" onclick="switchTab('home')"><div class="ti">🏠</div><div class="tl">Home</div></div>
+    <div class="tab on" onclick="switchTab('topics')"><div class="ti">⊞</div><div class="tl">Topics</div></div>
+    <div class="tplus" onclick="openC()">+</div>
+    <div class="tab" onclick="switchTab('notifs')"><div class="ti">🔔</div><div class="tl">Alerts</div></div>
+    <div class="tab" onclick="switchTab('profile')"><div class="ti">👤</div><div class="tl">Profile</div></div>
+  </div>
+</div>
+
+<!-- ══ COMMUNITY ══ -->
+<div class="scr" id="scr-community">
+  <div class="bar"><div class="bk" onclick="goBack()">‹</div><div style="flex:1"><div class="bar-title" style="font-size:17px">🌐 Community</div><div class="bar-sub">Open to all NZ healthcare</div></div><div class="ib" onclick="nav('scr-search')">🔍</div></div>
+  <div class="tog"><button class="tb on">🔥 Trending</button><button class="tb" onclick="toast('Showing latest')">🕐 Latest</button></div>
+  <div class="scroll" style="padding-top:2px">
+    <div class="card card-pin" onclick="openThread(0)"><div class="plbl">📌 Pinned</div><div class="ctag">🌐 Community</div><div class="ptitle">Welcome to ClinicPro Community — read this first</div><div class="pmeta"><div class="av" style="width:22px;height:22px;font-size:10px;background:#2C6E6A">T</div><span style="font-size:13px;color:var(--tm);font-weight:500">Dr. Tane W.</span><div style="width:3px;height:3px;background:var(--b);border-radius:50%"></div><span style="font-size:12px;color:var(--tm)">5 days ago</span></div><div class="pacts"><button class="ab" onclick="upvote(event,this)">▲ <span>52</span></button><button class="ab">💬 14</button><button class="ab sv" onclick="savePost(event,this)">🔖</button></div></div>
+    <div class="card" onclick="toast('Thread coming soon!')"><div class="ctag">🌐 Community</div><div class="ptitle">RNZCGP webinar — Managing difficult conversations in primary care. Wednesday 19 March, 7–8pm. 1 CME credit.</div><div class="pmeta"><div class="av" style="width:22px;height:22px;font-size:10px;background:#059669">Y</div><span style="font-size:13px;color:var(--tm);font-weight:500">Dr. Yolanda F.</span><div style="width:3px;height:3px;background:var(--b);border-radius:50%"></div><span style="font-size:12px;color:var(--tm)">3 days ago</span></div><div class="pacts"><button class="ab" onclick="upvote(event,this)">▲ <span>11</span></button><button class="ab">💬 2</button><button class="ab sv" onclick="savePost(event,this)">🔖</button></div></div>
+    <div class="card" onclick="toast('Thread coming soon!')"><div class="ctag">🌐 Community</div><div class="ptitle">Anyone recommend a good paeds dietitian in Wellington who takes ACC-funded referrals?</div><div class="pmeta"><div class="av" style="width:22px;height:22px;font-size:10px;background:#D97706">P</div><span style="font-size:13px;color:var(--tm);font-weight:500">Dr. Paula N.</span><div style="width:3px;height:3px;background:var(--b);border-radius:50%"></div><span style="font-size:12px;color:var(--tm)">4 days ago</span></div><div class="pacts"><button class="ab" onclick="upvote(event,this)">▲ <span>6</span></button><button class="ab">💬 8</button><button class="ab sv" onclick="savePost(event,this)">🔖</button></div></div>
+    <div class="card" onclick="toast('Thread coming soon!')"><div class="ctag">🌐 Community</div><div class="ptitle">Locum available — Wellington-based GP, 15 years experience, available for short-term cover from mid-April. Happy to travel within lower North Island.</div><div class="pmeta"><div class="av" style="width:22px;height:22px;font-size:10px;background:#7C3AED">C</div><span style="font-size:13px;color:var(--tm);font-weight:500">Dr. Craig M.</span><div style="width:3px;height:3px;background:var(--b);border-radius:50%"></div><span style="font-size:12px;color:var(--tm)">1 week ago</span></div><div class="pacts"><button class="ab" onclick="upvote(event,this)">▲ <span>4</span></button><button class="ab">💬 3</button><button class="ab sv" onclick="savePost(event,this)">🔖</button></div></div>
+  </div>
+</div>
+
+<!-- ══ GP FORUM ══ -->
+<div class="scr" id="scr-gpforum">
+  <div class="bar"><div class="bk" onclick="goBack()">‹</div><div style="flex:1"><div class="bar-title" style="font-size:17px">🩺 GP Forum</div><div class="bar-sub">263 posts · verified GPs only</div></div><div class="ib" onclick="nav('scr-search')">🔍</div></div>
+  <div class="scroll" style="padding-top:12px">
+    <div style="margin:0 12px 14px;background:linear-gradient(135deg,#fff5f5,#fee2e2);border:1px solid #fecaca;border-radius:18px;padding:18px 16px">
+      <div style="font-size:30px;margin-bottom:8px">🩺</div>
+      <div style="font-size:15px;font-weight:700;color:var(--t);margin-bottom:4px">GP Forum</div>
+      <div style="font-size:13px;color:var(--tm);line-height:1.5">A verified space for NZ GPs. Three subcategories below — choose the one that fits your post best.</div>
+    </div>
+
+    <div style="padding:0 16px 8px;font-size:11px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.6px">Subcategories</div>
+
+    <div class="sc" onclick="openSubcat('Clinical','🩺',142)">
+      <div class="sc-ico" style="background:#FEE2E2">🩺</div>
+      <div class="sc-info"><div class="sc-name">Clinical</div><div class="sc-desc">Case discussions, prescribing, diagnosis, ACC referrals, specialist recommendations</div><div class="sc-stat">142 posts · last post 3h ago</div></div>
+      <div class="sc-arr">›</div>
+      <div class="sc-prev">"Mild thrombocytopaenia on routine bloods — workup before haematology referral?"</div>
+    </div>
+
+    <div class="sc" onclick="openSubcat('AI and Tech','🤖',67)">
+      <div class="sc-ico" style="background:#EDE9FE">🤖</div>
+      <div class="sc-info"><div class="sc-name">AI and Tech</div><div class="sc-desc">AI tools, Medtech tips and shortcuts, software that makes GP life easier</div><div class="sc-stat">67 posts · last post 1h ago</div></div>
+      <div class="sc-arr">›</div>
+      <div class="sc-prev">"AI scribe tools — which ones are NZ GPs actually finding useful in the consult room?"</div>
+    </div>
+
+    <div class="sc" onclick="openSubcat('Staffroom','☕',54)">
+      <div class="sc-ico" style="background:#DCFCE7">☕</div>
+      <div class="sc-info"><div class="sc-name">Staffroom</div><div class="sc-desc">Venting, humour, CPD events, professional news, the stuff that doesn't fit elsewhere</div><div class="sc-stat">54 posts · last post 45m ago</div></div>
+      <div class="sc-arr">›</div>
+      <div class="sc-prev">"Patient brought me a printout about mould toxicity causing chronic fatigue..."</div>
+    </div>
+
+    <div style="margin:14px 12px 4px;background:linear-gradient(135deg,#f0fdf9,#e8f4f3);border:1px solid #b2deda;border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="toast('Opening NZ Formulary...')">
+      <div style="font-size:22px">💊</div>
+      <div style="flex:1"><div style="font-size:11px;font-weight:700;color:var(--p);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">🔥 Trending tool in Clinical</div><div style="font-size:14px;font-weight:600;color:var(--t)">NZ Formulary — Interaction Checker</div><div style="font-size:12px;color:var(--tm)">312 GPs saved · Updated this week</div></div>
+      <div style="font-size:16px;color:var(--p);font-weight:700">↗</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PRACTICE OWNERS ══ -->
+<div class="scr" id="scr-owners">
+  <div class="bar"><div class="bk" onclick="goBack()">‹</div><div style="flex:1"><div class="bar-title" style="font-size:17px">🏢 Practice Owners</div><div class="bar-sub">43 posts · owners and managers only</div></div><div class="ib" onclick="nav('scr-search')">🔍</div></div>
+  <div class="gate"><div class="gate-i">🔒</div><div><div class="gate-title">Practice Owners only</div><div class="gate-txt">This space is for verified practice owners and managers. Covers finances, compliance, staffing, ACC contracts, and equipment.</div><button class="gate-btn" onclick="toast('Role verification coming soon!')">Verify my role to join</button></div></div>
+  <div class="tog"><button class="tb on">🔥 Trending</button><button class="tb" onclick="toast('Showing latest')">🕐 Latest</button></div>
+  <div class="scroll" style="padding-top:2px">
+    <div class="card" onclick="openThread(5)"><div class="ctag">🏢 Practice Owners</div><div class="ptitle">Patient portal implementation — which system are practices using and what's the realistic time cost on the clinical team?</div><div class="pmeta"><div class="av" style="width:22px;height:22px;font-size:10px;background:#0369A1">J</div><span style="font-size:13px;color:var(--tm);font-weight:500">Dr. James K.</span><div style="width:3px;height:3px;background:var(--b);border-radius:50%"></div><span style="font-size:12px;color:var(--tm)">2 days ago</span></div><div class="pacts"><button class="ab" onclick="upvote(event,this)">▲ <span>17</span></button><button class="ab">💬 9</button><button class="ab sv" onclick="savePost(event,this)">🔖</button></div></div>
+    <div class="card" onclick="toast('Thread coming soon!')"><div class="ctag">🏢 Practice Owners</div><div class="ptitle">Locum pay rates in 2026 — what are practices in Auckland and Wellington currently offering per session?</div><div class="pmeta"><div class="av" style="width:22px;height:22px;font-size:10px;background:#DC2626">B</div><span style="font-size:13px;color:var(--tm);font-weight:500">Dr. Bridget S.</span><div style="width:3px;height:3px;background:var(--b);border-radius:50%"></div><span style="font-size:12px;color:var(--tm)">3 days ago</span></div><div class="pacts"><button class="ab" onclick="upvote(event,this)">▲ <span>23</span></button><button class="ab">💬 15</button><button class="ab sv" onclick="savePost(event,this)">🔖</button></div></div>
+    <div class="card" onclick="toast('Thread coming soon!')"><div class="ctag">🏢 Practice Owners</div><div class="ptitle">Online temperature monitoring for vaccine fridges — which systems are practices using and are they worth the cost?</div><div class="pmeta"><div class="av" style="width:22px;height:22px;font-size:10px;background:#059669">H</div><span style="font-size:13px;color:var(--tm);font-weight:500">Dr. Helen C.</span><div style="width:3px;height:3px;background:var(--b);border-radius:50%"></div><span style="font-size:12px;color:var(--tm)">4 days ago</span></div><div class="pacts"><button class="ab" onclick="upvote(event,this)">▲ <span>12</span></button><button class="ab">💬 7</button><button class="ab sv" onclick="savePost(event,this)">🔖</button></div></div>
+    <div class="card" onclick="toast('Thread coming soon!')"><div class="ctag">🏢 Practice Owners</div><div class="ptitle">ACC capitation contract renegotiation — is anyone else getting pushback on the new reporting requirements?</div><div class="pmeta"><div class="av" style="width:22px;height:22px;font-size:10px;background:#7C3AED">W</div><span style="font-size:13px;color:var(--tm);font-weight:500">Dr. William A.</span><div style="width:3px;height:3px;background:var(--b);border-radius:50%"></div><span style="font-size:12px;color:var(--tm)">5 days ago</span></div><div class="pacts"><button class="ab" onclick="upvote(event,this)">▲ <span>19</span></button><button class="ab">💬 11</button><button class="ab sv" onclick="savePost(event,this)">🔖</button></div></div>
+  </div>
+</div>
+
+<!-- ══ SUBCATEGORY THREAD LIST ══ -->
+<div class="scr" id="scr-subcat">
+  <div class="bar"><div class="bk" onclick="goBack()">‹</div><div style="flex:1"><div class="bar-title" id="sc-title" style="font-size:16px">Clinical</div><div class="bar-sub" id="sc-sub">142 posts in GP Forum</div></div><div class="ib" onclick="openC()">✏️</div></div>
+  <div class="tog"><button class="tb on" id="sctb" onclick="toggleSc('t')">🔥 Trending</button><button class="tb" id="sclb" onclick="toggleSc('l')">🕐 Latest</button></div>
+  <div class="scroll" id="sc-list" style="padding-top:2px"></div>
+</div>
+
+<!-- ══ THREAD VIEW ══ -->
+<div class="scr" id="scr-thread">
+  <div class="bar"><div class="bk" onclick="goBack()">‹</div><div class="bar-title" id="th-cat" style="font-family:'DM Sans';font-size:14px;font-weight:600;flex:1"></div><div class="ib">⋯</div></div>
+  <div class="scroll">
+    <div class="tpost">
+      <div class="ctag" id="th-ctag"></div>
+      <div class="ttitle2" id="th-title"></div>
+      <div class="pmeta" style="margin-bottom:12px"><div class="av" id="th-av" style="width:28px;height:28px;font-size:12px"></div><span style="font-size:13px;color:var(--tm);font-weight:500" id="th-author"></span><div style="width:3px;height:3px;background:var(--b);border-radius:50%"></div><span style="font-size:12px;color:var(--tm)" id="th-time"></span></div>
+      <div class="tbody" id="th-body"></div>
+      <div class="tacts"><button class="tap" id="th-upbtn" onclick="upvoteThread()">▲ <span id="th-upcnt"></span></button><button class="tap" onclick="toast('Saved!')">🔖 Save</button><button class="tap" onclick="toast('Link copied!')">↗ Share</button></div>
+    </div>
+    <div class="rhdr"><span id="th-rcnt"></span> Replies</div>
+    <div id="th-replies"></div>
+    <div style="padding:16px"><button style="width:100%;height:48px;background:var(--pl);border:1.5px solid var(--p);border-radius:14px;color:var(--p);font-family:'DM Sans';font-size:14px;font-weight:600;cursor:pointer" onclick="toast('Reply composer coming soon!')">↩ Write a reply</button></div>
+  </div>
+</div>
+
+<!-- ══ SEARCH ══ -->
+<div class="scr" id="scr-search">
+  <div class="bar"><div class="bk" onclick="goBack()">‹</div><div class="bar-title">Search</div></div>
+  <div class="sw"><div class="sbar"><span style="color:var(--tm)">🔍</span><input type="text" placeholder="Search posts and tools..." oninput="handleSearch(this.value)"></div></div>
+  <div class="stabs"><button class="stab on" onclick="setSTab(this,'posts')">Posts</button><button class="stab" onclick="setSTab(this,'tools')">Tools</button><button class="stab" onclick="setSTab(this,'people')">People</button></div>
+  <div class="scroll">
+    <div style="padding:16px"><div style="font-size:13px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">🔥 Trending searches</div><div><span class="pill" onclick="toast('Searching: polymyalgia')">polymyalgia</span><span class="pill" onclick="toast('Searching: AI scribe')">AI scribe</span><span class="pill" onclick="toast('Searching: recurrent UTI')">recurrent UTI</span><span class="pill" onclick="toast('Searching: patient portal')">patient portal</span><span class="pill" onclick="toast('Searching: thrombocytopaenia')">thrombocytopaenia</span><span class="pill" onclick="toast('Searching: locum rates')">locum rates</span></div></div>
+    <div class="div"><div class="dl"></div><div class="dt">Suggested posts</div><div class="dl"></div></div>
+    <div class="card" onclick="openThread(2)" style="margin-top:4px"><div class="ctag">🤖 AI and Tech</div><div class="ptitle">Using an AI scribe in consultations — which tools are NZ GPs actually finding useful, and what are the privacy concerns?</div><div class="pmeta"><div class="av" style="width:22px;height:22px;font-size:10px;background:#DC2626">M</div><span style="font-size:13px;color:var(--tm);font-weight:500">Dr. Marcus T.</span><div style="width:3px;height:3px;background:var(--b);border-radius:50%"></div><span style="font-size:12px;color:var(--tm)">5h ago</span></div><div class="pacts"><button class="ab" onclick="upvote(event,this)">▲ <span>38</span></button><button class="ab">💬 17</button></div></div>
+  </div>
+</div>
+
+<!-- ══ NOTIFICATIONS ══ -->
+<div class="scr" id="scr-notifs">
+  <div class="bar"><div class="bar-title">Notifications</div><button class="txbtn" onclick="markRead()">Mark all read</button></div>
+  <div class="scroll">
+    <div class="ni unread" id="ni1" onclick="openThread(1)"><div class="ni-aw"><div class="ni-a" style="background:#059669">N</div><div class="ni-ti" style="background:#E8F4F3">💬</div></div><div class="ni-b"><div class="ni-t"><strong>Dr. Ngaio P.</strong> replied to your post in Clinical</div><div class="ni-p">"We've been using topical oestrogen for 18 months now — it's been a..."</div><div class="ni-ts">1 hour ago</div></div><div class="ni-d"></div></div>
+    <div class="ni unread" id="ni2" onclick="openThread(2)"><div class="ni-aw"><div class="ni-a" style="background:#DC2626">M</div><div class="ni-ti" style="background:#FEF3C7">▲</div></div><div class="ni-b"><div class="ni-t"><strong>6 GPs</strong> upvoted your post in AI and Tech</div><div class="ni-p">"Using an AI scribe in consultations..."</div><div class="ni-ts">3 hours ago</div></div><div class="ni-d"></div></div>
+    <div class="ni" onclick="toast('Tool approved!')"><div class="ni-aw"><div class="ni-a" style="background:#2C6E6A">T</div><div class="ni-ti" style="background:#DCFCE7">✓</div></div><div class="ni-b"><div class="ni-t">Your <strong>tool submission</strong> was approved for the directory</div><div class="ni-p">Jack of All Organs — now live in Clinical Tools</div><div class="ni-ts">Yesterday</div></div></div>
+    <div class="ni" onclick="openThread(4)"><div class="ni-aw"><div class="ni-a" style="background:#7C3AED">S</div><div class="ni-ti" style="background:#E8F4F3">💬</div></div><div class="ni-b"><div class="ni-t"><strong>Dr. Steph L.</strong> replied in a thread you follow</div><div class="ni-p">"I just acknowledge the frustration first, then ask what they..."</div><div class="ni-ts">2 days ago</div></div></div>
+  </div>
+  <div class="tabs">
+    <div class="tab" onclick="switchTab('home')"><div class="ti">🏠</div><div class="tl">Home</div></div>
+    <div class="tab" onclick="switchTab('topics')"><div class="ti">⊞</div><div class="tl">Topics</div></div>
+    <div class="tplus" onclick="openC()">+</div>
+    <div class="tab on" onclick="switchTab('notifs')"><div class="ti">🔔</div><div class="tl">Alerts</div></div>
+    <div class="tab" onclick="switchTab('profile')"><div class="ti">👤</div><div class="tl">Profile</div></div>
+  </div>
+</div>
+
+<!-- ══ PROFILE ══ -->
+<div class="scr" id="scr-profile">
+  <div class="bar"><div class="bar-title">Profile</div><div class="ib" onclick="toast('Settings coming soon!')">⚙️</div></div>
+  <div class="scroll">
+    <div class="ph"><div class="pav" style="background:#2C6E6A">T</div><div class="pname">Dr. Tane W.</div><div class="prole">GP · Auckland · Member since Jan 2026</div><div class="pstats"><div class="ps"><div class="psn">9</div><div class="psl">Posts</div></div><div class="ps"><div class="psn">73</div><div class="psl">Upvotes</div></div><div class="ps"><div class="psn">2</div><div class="psl">Tools</div></div></div></div>
+    <div class="ptabs"><div class="ptab on" id="pt-p" onclick="switchPT('p')">📝 Posts</div><div class="ptab" id="pt-s" onclick="switchPT('s')">🔖 Saved</div><div class="ptab" id="pt-t" onclick="switchPT('t')">🔧 Tools</div></div>
+    <div id="pt-pc"><div class="card" onclick="openThread(0)" style="margin-top:8px"><div class="ctag">🌐 Community</div><div class="ptitle">Welcome to ClinicPro Community — read this first</div><div class="pacts" style="margin-top:8px"><button class="ab">▲ 52</button><button class="ab">💬 14</button></div></div><div class="card" onclick="openThread(2)"><div class="ctag">🤖 AI and Tech</div><div class="ptitle">Using an AI scribe in consultations — which tools are NZ GPs actually finding useful?</div><div class="pacts" style="margin-top:8px"><button class="ab">▲ 38</button><button class="ab">💬 17</button></div></div></div>
+    <div id="pt-sc" style="display:none"><div class="empty" id="saved-empty"><div style="font-size:40px;margin-bottom:4px">🔖</div><div style="font-size:16px;font-weight:600;color:var(--t)">Nothing saved yet</div><div style="font-size:14px;color:var(--tm);line-height:1.5">Tap the bookmark on any post to save it here.</div></div><div id="saved-items"></div></div>
+    <div id="pt-tc" style="display:none"><div style="margin:8px 12px"><div class="tc" style="width:100%" onclick="toast('Jack of All Organs — approved')"><div style="display:flex;align-items:center;gap:10px"><div style="font-size:22px">🧮</div><div><div style="font-size:13px;font-weight:600;color:var(--t)">Jack of All Organs</div><div style="font-size:11px;color:var(--tm)">Submitted by you · Approved</div></div><span style="margin-left:auto;font-size:11px;background:#DCFCE7;color:#059669;padding:3px 8px;border-radius:20px;font-weight:600">Live</span></div></div></div></div>
+  </div>
+  <div class="tabs">
+    <div class="tab" onclick="switchTab('home')"><div class="ti">🏠</div><div class="tl">Home</div></div>
+    <div class="tab" onclick="switchTab('topics')"><div class="ti">⊞</div><div class="tl">Topics</div></div>
+    <div class="tplus" onclick="openC()">+</div>
+    <div class="tab" onclick="switchTab('notifs')"><div class="ti">🔔</div><div class="tl">Alerts</div></div>
+    <div class="tab on" onclick="switchTab('profile')"><div class="ti">👤</div><div class="tl">Profile</div></div>
+  </div>
+</div>
+
+</div>
+<script>
+// STATE
+let cur='scr-ob',prev=null,thUp=false,savedPosts=[];
+
+// THREADS
+const threads=[
+  {cat:'🌐 Community',title:'Welcome to ClinicPro Community — read this first',author:'Dr. Tane W.',letter:'T',color:'#2C6E6A',time:'5 days ago',upvotes:52,body:`Welcome to ClinicPro Community.\n\nThree spaces, each with a different audience:\n\n🌐 Community — open to all NZ healthcare\n🩺 GP Forum — verified GPs only (Clinical, AI and Tech, Staffroom)\n🏢 Practice Owners — verified owners and managers only\n\nGround rules:\n• Be collegial — this is a peer space, not social media\n• No commercial promotion\n• For urgent clinical decisions, use appropriate channels\n\nIf you find a useful tool, submit it to the directory via the compose button. Good to have you here.`,replies:[
+    {author:'Dr. Fiona H.',letter:'F',color:'#7C3AED',time:'4 days ago',body:'Wonderful to have an organised space for this. The Facebook group has been great but this structure is much better for finding things later.',upvotes:18,nested:[]},
+    {author:'Dr. Marcus T.',letter:'M',color:'#DC2626',time:'4 days ago',body:'The GP-only forum is the feature I\'ve been wanting. Some conversations are better had within the profession.',upvotes:12,nested:[]}
+  ]},
+  {cat:'🩺 Clinical',title:'Long-term low-dose prednisolone in elderly PMR patients — when do you try to wean and what\'s your threshold?',author:'Dr. Fiona H.',letter:'F',color:'#7C3AED',time:'3h ago',upvotes:21,body:`Have a 78-year-old woman who has been on 5mg prednisolone for PMR for three years. Every time we try to wean below 4mg her ESR climbs and she gets shoulder and hip girdle pain back within two weeks.\n\nShe is otherwise well, DEXA is showing mild osteopaenia, and she's on calcium/vitamin D. I've tried calcium with a slower taper over six weeks and the same thing happens.\n\nAt what point do you accept that some elderly PMR patients just need to stay on a low maintenance dose indefinitely? And how do you document and review that decision?`,replies:[
+    {author:'Dr. Ngaio P.',letter:'N',color:'#059669',time:'2h ago',body:'I have a few patients like this. At 78 with stable osteopaenia and only 5mg, I think indefinite maintenance is a reasonable and documented decision. The risk of undertreated PMR — falls, disability, pain — outweighs the bone risk at that dose in my view. I document it as a shared decision review annually.',upvotes:14,nested:[]},
+    {author:'Dr. Steph L.',letter:'S',color:'#7C3AED',time:'1h ago',body:'Have you tried adding methotrexate as a steroid-sparing agent? Rheumatology sometimes uses it in exactly this scenario. Worth a rheum opinion if you haven\'t had one.',upvotes:8,nested:[
+      {author:'Dr. Fiona H.',letter:'F',color:'#7C3AED',time:'45m ago',body:'Good thought — she was reviewed by rheum two years ago who agreed with the diagnosis but didn\'t suggest methotrexate at the time. Might be worth re-referring given the difficulty weaning.',upvotes:4}
+    ]}
+  ]},
+  {cat:'🤖 AI and Tech',title:'Using an AI scribe in consultations — which tools are NZ GPs actually finding useful, and what are the privacy concerns?',author:'Dr. Marcus T.',letter:'M',color:'#DC2626',time:'5h ago',upvotes:38,body:`There's been a lot of interest in AI scribes lately. I've trialled two — one that runs locally and one that's cloud-based — and my experience has been mixed.\n\nThe transcription accuracy is surprisingly good for structured consultations. It falls apart a bit for complex multimorbidity consults where I'm jumping between problems.\n\nMy main concern is the cloud-based ones and where patient audio is being processed and stored. Has anyone gotten a legal/privacy opinion on this in the NZ context? The Health Information Privacy Code seems relevant but I'm not sure how it applies to third-party AI processors.`,replies:[
+    {author:'Dr. Rachel O.',letter:'R',color:'#D97706',time:'4h ago',body:'I asked our privacy officer about this. Her view was that if audio leaves NZ servers you need explicit patient consent and it should be documented. We now have a laminated card on the desk patients can read before consults. No one has objected yet.',upvotes:17,nested:[]},
+    {author:'Dr. Ngaio P.',letter:'N',color:'#059669',time:'3h ago',body:'The locally-run options are much better for this reason. Slightly less polished output but you know exactly where the data stays. Worth the trade-off in my view.',upvotes:11,nested:[]}
+  ]},
+  {cat:'🩺 Clinical',title:'Recurrent UTIs in post-menopausal women — are you using topical oestrogen routinely now?',author:'Dr. Ngaio P.',letter:'N',color:'#059669',time:'Yesterday',upvotes:29,body:`The evidence for topical vaginal oestrogen in reducing recurrent UTIs in post-menopausal women is pretty compelling now. I've been using it more liberally over the last year and anecdotally my recurrent UTI patients are doing much better.\n\nA few questions for the group:\n- What threshold are you using before initiating? (2+ UTIs in 12 months?)\n- Are you prescribing estriol cream or ring?\n- Are there patients where you'd hesitate despite the evidence (e.g. hormone-sensitive cancers in remission)?`,replies:[
+    {author:'Dr. Fiona H.',letter:'F',color:'#7C3AED',time:'Yesterday',body:'Two or more in 12 months is my threshold. I use estriol cream — patients find it easier to manage than a ring. For hormone-sensitive cancer history I check with the oncologist first but topical oestrogen has minimal systemic absorption and most are fine with it after discussion.',upvotes:16,nested:[]},
+    {author:'Dr. James K.',letter:'J',color:'#0369A1',time:'Yesterday',body:'Worth noting the BPAC NZ update from late last year specifically supports this. It helped me have the conversation with patients who were initially hesitant about any oestrogen.',upvotes:9,nested:[]}
+  ]},
+  {cat:'☕ Staffroom',title:'Patient brought a printout about mould toxicity and chronic fatigue. How do you navigate these consults without losing the therapeutic relationship?',author:'Dr. Rachel O.',letter:'R',color:'#D97706',time:'Yesterday',upvotes:44,body:`Had a patient today who has been seeing me for fatigue for eight months. We've done a thorough workup — bloods, sleep study, mental health screen, all largely unremarkable. We've been working through lifestyle and I think we're making progress.\n\nShe arrived today with a six-page printout from a wellness influencer claiming her symptoms are definitely mould toxicity and she needs urine mycotoxin testing and a specific supplement protocol.\n\nI want to honour the fact that she's been unwell and seeking answers. But I also don't want to validate a framing that's going to lead her down an expensive and unhelpful path.\n\nHow do you all handle this?`,replies:[
+    {author:'Dr. Steph L.',letter:'S',color:'#7C3AED',time:'Yesterday',body:'I acknowledge the frustration first — "I can see you\'ve been doing a lot of research and I understand you want answers." Then I ask what would help them feel heard. Usually they just want to know I take the symptoms seriously, not necessarily the specific diagnosis.',upvotes:22,nested:[]},
+    {author:'Dr. Marcus T.',letter:'M',color:'#DC2626',time:'Yesterday',body:'I\'ve found it helps to say "the symptoms are definitely real, what we\'re trying to figure out is the best explanation." That separates validating their experience from endorsing the framework. Then I explain why urine mycotoxin tests have significant limitations without dismissing the whole thing.',upvotes:18,nested:[]}
+  ]},
+  {cat:'🏢 Practice Owners',title:'Patient portal implementation — which system and what\'s the realistic time cost on the clinical team?',author:'Dr. James K.',letter:'J',color:'#0369A1',time:'2 days ago',upvotes:17,body:`We're looking seriously at implementing a patient portal this year. Mainly to reduce phone call volume for results and prescription requests.\n\nWe're currently on Medtech Evolution. My main questions:\n\n1. Which portals are practices actually happy with (ManageMyHealth, Health365, other)?\n2. What was the actual time cost of setup and ongoing management?\n3. Did it reduce phone calls, or did it just shift the workload to messages in the portal?\n\nVery aware this could create as many problems as it solves if not implemented well.`,replies:[
+    {author:'Dr. Bridget S.',letter:'B',color:'#DC2626',time:'2 days ago',body:'We implemented ManageMyHealth 18 months ago. Setup took about six weeks including staff training. Phone calls for results dropped significantly — maybe 40%. But portal messages added a new workload stream that we hadn\'t planned for. Make sure you agree a response time policy before you go live.',upvotes:13,nested:[]},
+    {author:'Dr. Helen C.',letter:'H',color:'#059669',time:'Yesterday',body:'The phone call reduction is real. The message volume is also real. Net effect for us was slightly positive — we freed up reception time but added some clinical time. Worth it overall but go in with realistic expectations.',upvotes:9,nested:[]}
+  ]},
+  {cat:'🩺 Clinical',title:'Incidental mild thrombocytopaenia on routine bloods — workup before referring to haematology?',author:'Dr. Steph L.',letter:'S',color:'#7C3AED',time:'2 days ago',upvotes:25,body:`Incidental finding on a 54-year-old male, otherwise well. Platelets 98. Repeat in two weeks came back at 94. No signs of bleeding, spleen not palpable, no lymphadenopathy.\n\nNo recent viral illness, not on any new medications. Alcohol use is moderate.\n\nMy plan was to check a blood film, LFTs, and HIV before referring to haematology. Am I missing anything obvious in the workup?`,replies:[
+    {author:'Dr. Fiona H.',letter:'F',color:'#7C3AED',time:'2 days ago',body:'That\'s a reasonable initial workup. I\'d also add Hep B and C serology given isolated thrombocytopaenia — hepatitis is a common cause and changes management. Also worth reviewing any recent herbal supplements or OTC medications.',upvotes:16,nested:[]},
+    {author:'Dr. Ngaio P.',letter:'N',color:'#059669',time:'2 days ago',body:'Agree with the above. With platelets in the 90s and no bleeding, haematology will likely advise watchful waiting anyway, but a complete picture makes the referral more useful.',upvotes:8,nested:[]}
+  ]}
+];
+
+// SUBCAT THREADS
+const scT={
+  'Clinical':[
+    {i:1,tag:'🩺 Clinical',title:'Long-term low-dose prednisolone in elderly PMR — when to accept indefinite maintenance dose?',author:'Dr. Fiona H.',letter:'F',color:'#7C3AED',time:'3h ago',up:21,rep:11},
+    {i:3,tag:'🩺 Clinical',title:'Recurrent UTIs in post-menopausal women — are you using topical oestrogen routinely now?',author:'Dr. Ngaio P.',letter:'N',color:'#059669',time:'Yesterday',up:29,rep:16},
+    {i:6,tag:'🩺 Clinical',title:'Incidental mild thrombocytopaenia on routine bloods — workup before haematology referral?',author:'Dr. Steph L.',letter:'S',color:'#7C3AED',time:'2 days ago',up:25,rep:13},
+    {i:1,tag:'🩺 Clinical',title:'Unexplained weight loss workup — at what point are you requesting a CT chest-abdo-pelvis vs staging investigations incrementally?',author:'Dr. James K.',letter:'J',color:'#0369A1',time:'3 days ago',up:19,rep:8},
+    {i:3,tag:'🩺 Clinical',title:'ACC shoulder referral thresholds — are you getting pushback on Grade 2 AC joint injuries that need surgical assessment?',author:'Dr. Craig M.',letter:'C',color:'#D97706',time:'4 days ago',up:14,rep:6},
+    {i:6,tag:'🩺 Clinical',title:'Managing patients on GLP-1 agonists who develop significant nausea — dose reduction or switch?',author:'Dr. Yolanda F.',letter:'Y',color:'#059669',time:'5 days ago',up:31,rep:19},
+    {i:1,tag:'🩺 Clinical',title:'Private dermatology waitlist in Auckland is 6 months — how are you managing patients with suspected melanocytic lesions in the meantime?',author:'Dr. Marcus T.',letter:'M',color:'#DC2626',time:'1 week ago',up:37,rep:24},
+  ],
+  'AI and Tech':[
+    {i:2,tag:'🤖 AI and Tech',title:'Using an AI scribe in consultations — which tools are NZ GPs actually finding useful, and what are the privacy concerns?',author:'Dr. Marcus T.',letter:'M',color:'#DC2626',time:'5h ago',up:38,rep:17},
+    {i:2,tag:'🤖 AI and Tech',title:'Medtech template for 12-month prescribing review — has anyone built a clean one they\'d share?',author:'Dr. Helen C.',letter:'H',color:'#059669',time:'2 days ago',up:22,rep:9},
+    {i:2,tag:'🤖 AI and Tech',title:'Mouse programmable buttons for Medtech navigation — Logitech MX vs other options?',author:'Dr. William A.',letter:'W',color:'#7C3AED',time:'4 days ago',up:16,rep:5},
+    {i:2,tag:'🤖 AI and Tech',title:'Best Practice vs Medtech Evolution in 2026 — anyone switched recently and what was the migration experience like?',author:'Dr. Bridget S.',letter:'B',color:'#DC2626',time:'1 week ago',up:29,rep:14},
+    {i:2,tag:'🤖 AI and Tech',title:'Patient-facing chatbot for triage — has any NZ practice implemented this and does it reduce unnecessary appointments?',author:'Dr. Fiona H.',letter:'F',color:'#7C3AED',time:'2 weeks ago',up:18,rep:11},
+  ],
+  'Staffroom':[
+    {i:4,tag:'☕ Staffroom',title:'Patient brought a printout about mould toxicity and chronic fatigue — how to navigate without losing the relationship?',author:'Dr. Rachel O.',letter:'R',color:'#D97706',time:'Yesterday',up:44,rep:22},
+    {i:4,tag:'☕ Staffroom',title:'What do you say when a patient asks if you\'d send your own family member to the specialist you just referred them to?',author:'Dr. Steph L.',letter:'S',color:'#7C3AED',time:'2 days ago',up:33,rep:18},
+    {i:0,tag:'☕ Staffroom',title:'RNZCGP fellowship exam — anyone sitting it this year? Looking for study group / shared notes.',author:'Dr. Craig M.',letter:'C',color:'#D97706',time:'3 days ago',up:9,rep:7},
+    {i:4,tag:'☕ Staffroom',title:'GP registrar supervision hours — is anyone else finding the new logbook requirements are adding significant admin burden?',author:'Dr. Ngaio P.',letter:'N',color:'#059669',time:'4 days ago',up:26,rep:15},
+    {i:4,tag:'☕ Staffroom',title:'Funniest alternative therapy you\'ve encountered recently — sharing for mutual catharsis',author:'Dr. Marcus T.',letter:'M',color:'#DC2626',time:'5 days ago',up:61,rep:34},
+  ]
+};
+
+// NAV
+function nav(id){document.getElementById(cur).classList.remove('on');prev=cur;cur=id;document.getElementById(id).classList.add('on')}
+function goBack(){if(prev){document.getElementById(cur).classList.remove('on');cur=prev;prev=null;document.getElementById(cur).classList.add('on')}}
+function switchTab(t){const m={home:'scr-home',topics:'scr-topics',notifs:'scr-notifs',profile:'scr-profile'};if(m[t])nav(m[t])}
+
+// OPEN THREAD
+function openThread(i){
+  const t=threads[i];thUp=false;
+  document.getElementById('th-ctag').textContent=t.cat;
+  document.getElementById('th-title').textContent=t.title;
+  document.getElementById('th-author').textContent=t.author;
+  const av=document.getElementById('th-av');av.textContent=t.letter;av.style.background=t.color;
+  document.getElementById('th-time').textContent=t.time;
+  document.getElementById('th-body').innerHTML=t.body.replace(/\n/g,'<br>');
+  document.getElementById('th-upcnt').textContent=t.upvotes;
+  document.getElementById('th-upbtn').className='tap';
+  document.getElementById('th-rcnt').textContent=t.replies.length;
+  document.getElementById('th-replies').innerHTML=t.replies.map(r=>`
+    <div class="reply"><div class="pmeta"><div class="av" style="width:28px;height:28px;font-size:12px;background:${r.color}">${r.letter}</div><span style="font-size:13px;color:var(--tm);font-weight:500">${r.author}</span><div style="width:3px;height:3px;background:var(--b);border-radius:50%"></div><span style="font-size:12px;color:var(--tm)">${r.time}</span></div><div class="rb">${r.body}</div><div class="ra"><button class="ab" onclick="upvote(event,this)">▲ <span>${r.upvotes}</span></button><button class="ab" onclick="toast('Reply coming soon!')">↩ Reply</button></div></div>
+    ${(r.nested||[]).map(n=>`<div class="reply reply-n"><div class="pmeta"><div class="av" style="width:24px;height:24px;font-size:11px;background:${n.color}">${n.letter}</div><span style="font-size:13px;color:var(--tm);font-weight:500">${n.author}</span><div style="width:3px;height:3px;background:var(--b);border-radius:50%"></div><span style="font-size:12px;color:var(--tm)">${n.time}</span></div><div class="rb">${n.body}</div><div class="ra"><button class="ab" onclick="upvote(event,this)">▲ <span>${n.upvotes}</span></button><button class="ab" onclick="toast('Reply coming soon!')">↩ Reply</button></div></div>`).join('')}
+  `).join('');
+  nav('scr-thread');
+}
+function upvoteThread(){thUp=!thUp;const c=document.getElementById('th-upcnt');c.textContent=parseInt(c.textContent)+(thUp?1:-1);document.getElementById('th-upbtn').className='tap'+(thUp?' on':'')}
+
+// SUBCAT
+function openSubcat(name,icon,count){
+  document.getElementById('sc-title').textContent=icon+' '+name;
+  document.getElementById('sc-sub').textContent=count+' posts in GP Forum';
+  document.getElementById('sctb').classList.add('on');document.getElementById('sclb').classList.remove('on');
+  const posts=scT[name]||[];
+  document.getElementById('sc-list').innerHTML=posts.length
+    ?posts.map(p=>`<div class="card" onclick="openThread(${p.i})"><div class="ctag">${p.tag}</div><div class="ptitle">${p.title}</div><div class="pmeta"><div class="av" style="width:22px;height:22px;font-size:10px;background:${p.color}">${p.letter}</div><span style="font-size:13px;color:var(--tm);font-weight:500">${p.author}</span><div style="width:3px;height:3px;background:var(--b);border-radius:50%"></div><span style="font-size:12px;color:var(--tm)">${p.time}</span></div><div class="pacts"><button class="ab" onclick="upvote(event,this)">▲ <span>${p.up}</span></button><button class="ab">💬 ${p.rep}</button><button class="ab sv" onclick="savePost(event,this)">🔖</button></div></div>`).join('')
+    :'<div class="empty"><div style="font-size:40px">💬</div><div style="font-size:16px;font-weight:600;color:var(--t);margin-top:8px">No posts yet</div><div style="font-size:14px;color:var(--tm);margin-top:4px">Be the first to start a discussion.</div></div>';
+  nav('scr-subcat');
+}
+function toggleSc(t){document.getElementById('sctb').classList.toggle('on',t==='t');document.getElementById('sclb').classList.toggle('on',t==='l');toast(t==='l'?'Showing latest':'Showing trending')}
+
+// UPVOTE/SAVE
+function upvote(e,btn){e.stopPropagation();const sp=btn.querySelector('span');const on=btn.classList.contains('up');btn.classList.toggle('up',!on);sp.textContent=parseInt(sp.textContent)+(on?-1:1)}
+function savePost(e,btn){e.stopPropagation();const saved=btn.classList.contains('saved');btn.classList.toggle('saved',!saved);toast(saved?'Removed from saved':'Saved to your profile!');if(!saved){const title=btn.closest('.card')?.querySelector('.ptitle')?.textContent;if(title&&!savedPosts.includes(title)){savedPosts.push(title);document.getElementById('saved-empty').style.display='none';const d=document.createElement('div');d.className='card';d.style.marginTop='8px';d.innerHTML=`<div class="ptitle">${title}</div><div class="pacts" style="margin-top:8px"><button class="ab">🔖 Saved</button></div>`;document.getElementById('saved-items').appendChild(d)}}}
+
+// COMPOSE
+function openC(){document.getElementById('csh').classList.add('on');document.getElementById('cov').classList.add('on')}
+function closeC(){document.getElementById('csh').classList.remove('on');document.getElementById('cov').classList.remove('on')}
+function validateC(){const c=document.getElementById('ccat').value;const t=document.getElementById('ctitle').value.trim();document.getElementById('pbtn').disabled=!(c&&t.length>=10)}
+function submitPost(){closeC();document.getElementById('ccat').value='';document.getElementById('ctitle').value='';document.getElementById('cbody').value='';document.getElementById('pbtn').disabled=true;toast('✅ Post submitted!')}
+
+// FEED
+function toggleFeed(t){document.getElementById('htb').classList.toggle('on',t==='t');document.getElementById('hlb').classList.toggle('on',t==='l');toast(t==='l'?'Showing latest':'Showing trending')}
+
+// SEARCH
+function handleSearch(v){if(v.length>2)toast(`Searching for "${v}"...`)}
+function setSTab(btn,t){document.querySelectorAll('.stab').forEach(b=>b.classList.remove('on'));btn.classList.add('on');toast(`Showing ${t}`)}
+
+// NOTIFICATIONS
+function markRead(){document.querySelectorAll('.ni.unread').forEach(n=>n.classList.remove('unread'));document.querySelectorAll('.ni-d').forEach(d=>d.remove());toast('All notifications marked as read')}
+
+// PROFILE TABS
+function switchPT(t){['p','s','t'].forEach(x=>{document.getElementById(`pt-${x}`).classList.toggle('on',x===t);document.getElementById(`pt-${x}c`).style.display=x===t?'block':'none'})}
+
+// TOAST
+let tt;function toast(m){const e=document.getElementById('toast');e.textContent=m;e.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('on'),2200)}
+</script>
+</body>
+</html>
